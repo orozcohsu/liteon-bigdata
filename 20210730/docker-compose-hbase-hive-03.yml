@@ -1,0 +1,151 @@
+version: "3"
+
+services:
+  namenode:
+    image: liteonlab/hadoop-namenode:1.0.0-hadoop2.7.4-java8
+    container_name: namenode
+    volumes:
+      - hadoop_namenode:/hadoop/dfs/name
+    expose:
+      - "9000"
+    ports:
+      - 50070:50070
+    environment:
+      - CLUSTER_NAME=test
+    env_file:
+      - ./hadoopbase/hadoop.env
+
+  datanode:
+    image: liteonlab/hadoop-datanode:1.0.0-hadoop2.7.4-java8
+    container_name: datanode
+    volumes:
+      - hadoop_datanode:/hadoop/dfs/data
+    environment:
+      SERVICE_PRECONDITION: "namenode:50070"
+    env_file:
+      - ./hadoopbase/hadoop.env
+
+  resourcemanager:
+    image: liteonlab/hadoop-resourcemanager:1.0.0-hadoop2.7.4-java8
+    container_name: resourcemanager
+    restart: always
+    ports:
+      - 8088:8088
+    environment:
+      SERVICE_PRECONDITION: "namenode:50070 datanode:50075"
+    env_file:
+      - ./hadoopbase/hadoop.env
+
+  nodemanager1:
+    image: liteonlab/hadoop-nodemanager:1.0.0-hadoop2.7.4-java8
+    container_name: nodemanager
+    environment:
+      SERVICE_PRECONDITION: "namenode:50070 datanode:50075 resourcemanager:8088"
+    env_file:
+      - ./hadoopbase/hadoop.env
+
+  historyserver:
+    image: liteonlab/hadoop-historyserver:1.0.0-hadoop2.7.4-java8
+    container_name: historyserver
+    volumes:
+      - hadoop_historyserver:/hadoop/yarn/timeline
+    ports:
+      - 8188:8188
+    environment:
+      SERVICE_PRECONDITION: "namenode:50070 datanode:50075 resourcemanager:8088"
+    env_file:
+      - ./hadoopbase/hadoop.env
+
+  zoo:
+    image: zookeeper:3.4.10
+    container_name: zoo
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_SERVERS: server.1=0.0.0.0:2888:3888
+    ports:
+      - 2181:2181
+
+  hbase-master:
+    image: liteonlab/hbase-master:1.0.0-hbase1.4.13
+    container_name: hbase-master
+    depends_on:
+      - "namenode"
+      - "resourcemanager"
+    hostname: hbase-master
+    env_file:
+      - ./hivebase/hbase-distributed-local.env
+    environment:
+      SERVICE_PRECONDITION: "namenode:9000 datanode:50075 zoo:2181"
+    ports:
+      - 16010:16010
+      - 4444:4444
+
+  hbase-region:
+    image: liteonlab/hbase-regionserver:1.0.0-hbase1.4.13
+    container_name: hbase-regionserver
+    hostname: hbase-regionserver
+    env_file:
+      - ./hivebase/hbase-distributed-local.env
+    environment:
+      HBASE_CONF_hbase_regionserver_hostname: hbase-region
+      SERVICE_PRECONDITION: "namenode:9000 datanode:50075 zoo:2181 hbase-master:16010"
+    ports:
+      - 16030:16030
+
+  hive-server:
+    image: liteonlab/hive-server:1.0.0-hive2.3.2
+    container_name: hive-server
+    env_file:
+      - ./hivebase/hadoop-hive.env
+    environment:
+      HIVE_CORE_CONF_javax_jdo_option_ConnectionURL: "jdbc:mysql://metadata/hive?useSSL=false"
+      SERVICE_PRECONDITION: "namenode:9000 datanode:50075 hive-metastore:9083"
+    ports:
+      - "10000:10000"
+
+  hive-metastore:
+    image: liteonlab/hive-server:1.0.0-hive2.3.2
+    container_name: hive-metastore
+    env_file:
+      - ./hivebase/hadoop-hive.env
+    command: /opt/hive/bin/hive --service metastore
+    depends_on:
+      - "metadata"
+    environment:
+      SERVICE_PRECONDITION: "namenode:9000 datanode:50075"
+    ports:
+      - "9083:9083"
+
+  presto-coordinator:
+    image: liteonlab/prestodb:1.0.0-prestodb0.181
+    container_name: prestodb
+    ports:
+      - "8089:8080"
+
+  metadata:
+    image: mysql:5.7
+    container_name: metadata
+    restart: always
+    expose:
+      - "3306"
+    ports:
+      - "3306:3306"
+    environment:
+        MYSQL_ROOT_USER: root
+        MYSQL_ROOT_PASSWORD: 1234
+        MYSQL_DATABASE: hive
+        MYSQL_USER: hive
+        MYSQL_PASSWORD: hive
+    healthcheck:
+        test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+        timeout: 20s
+        retries: 10
+    volumes:
+      - ./mysql-init-files:/docker-entrypoint-initdb.d
+      - metadata:/var/lib/mysql/
+
+volumes:
+  hadoop_namenode:
+  hadoop_datanode:
+  hadoop_historyserver:
+  metadata:
