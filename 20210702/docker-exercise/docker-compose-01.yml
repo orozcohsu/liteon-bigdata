@@ -2,13 +2,11 @@ version: "3"
 
 services:
   database:
-    image: mysql:5.7
+    image: orozcohsu/mysql:5.7
     container_name: database
     restart: always
-    expose:
-      - "3306"
     ports:
-      - "3306:3306"
+      - "3307:3306"
     environment:
         MYSQL_ROOT_USER: root
         MYSQL_ROOT_PASSWORD: 1234
@@ -26,9 +24,11 @@ services:
   client:
     image: imega/mysql-client
     container_name: client
-    command: tail -f /dev/null
+    command: sh -c "echo 'ok' && tail -f /dev/null"
     links:
       - "database"
+    volumes:
+      - ./data:/data
 
 volumes:
   mydatabase:
