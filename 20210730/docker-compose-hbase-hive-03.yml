@@ -144,8 +144,34 @@ services:
       - ./mysql-init-files:/docker-entrypoint-initdb.d
       - metadata:/var/lib/mysql/
 
+  jupyter:
+    image: liteonlab/jupyter:1.0.0
+    build:
+      context: ./jupyter
+      dockerfile: dockerfile-jupyter
+    container_name: jupyter
+    ports:
+      - 8888:8888
+    command: start-notebook.sh --NotebookApp.token='1qaz@WSX'
+    healthcheck:
+        test: ["CMD", "curl", "-f", "localhost:8888"]
+        timeout: 20s
+        retries: 10
+    volumes:
+      - jupyter:/home/jovyan/work:rw
+
+  nodered:
+    image: liteonlab/nodered:1.0.0-v6
+    container_name: nodered
+    ports:
+      - "1880:1880"
+    volumes:
+      - nodered:/data
+
 volumes:
   hadoop_namenode:
   hadoop_datanode:
   hadoop_historyserver:
   metadata:
+  jupyter:
+  nodered:
