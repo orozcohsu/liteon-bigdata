@@ -2,7 +2,7 @@ version: "3"
 
 services:
   namenode:
-    image: liteonlab/hadoop-namenode:1.0.0-hadoop2.7.4-java8
+    image: orozcohsu/hadoop-namenode:1.0.0-hadoop2.7.4-java8
     container_name: namenode
     volumes:
       - hadoop_namenode:/hadoop/dfs/name
@@ -16,7 +16,7 @@ services:
       - ./hadoopbase/hadoop.env
 
   datanode:
-    image: liteonlab/hadoop-datanode:1.0.0-hadoop2.7.4-java8
+    image: orozcohsu/hadoop-datanode:1.0.0-hadoop2.7.4-java8
     container_name: datanode
     volumes:
       - hadoop_datanode:/hadoop/dfs/data
@@ -26,7 +26,7 @@ services:
       - ./hadoopbase/hadoop.env
 
   resourcemanager:
-    image: liteonlab/hadoop-resourcemanager:1.0.0-hadoop2.7.4-java8
+    image: orozcohsu/hadoop-resourcemanager:1.0.0-hadoop2.7.4-java8
     container_name: resourcemanager
     restart: always
     ports:
@@ -37,7 +37,7 @@ services:
       - ./hadoopbase/hadoop.env
 
   nodemanager1:
-    image: liteonlab/hadoop-nodemanager:1.0.0-hadoop2.7.4-java8
+    image: orozcohsu/hadoop-nodemanager:1.0.0-hadoop2.7.4-java8
     container_name: nodemanager
     environment:
       SERVICE_PRECONDITION: "namenode:50070 datanode:50075 resourcemanager:8088"
@@ -45,7 +45,7 @@ services:
       - ./hadoopbase/hadoop.env
 
   historyserver:
-    image: liteonlab/hadoop-historyserver:1.0.0-hadoop2.7.4-java8
+    image: orozcohsu/hadoop-historyserver:1.0.0-hadoop2.7.4-java8
     container_name: historyserver
     volumes:
       - hadoop_historyserver:/hadoop/yarn/timeline
@@ -66,7 +66,7 @@ services:
       - 2181:2181
 
   hbase-master:
-    image: liteonlab/hbase-master:1.0.0-hbase1.4.13
+    image: orozcohsu/hbase-master:1.0.0-hbase1.4.13
     container_name: hbase-master
     depends_on:
       - "namenode"
@@ -81,7 +81,7 @@ services:
       - 4444:4444
 
   hbase-region:
-    image: liteonlab/hbase-regionserver:1.0.0-hbase1.4.13
+    image: orozcohsu/hbase-regionserver:1.0.0-hbase1.4.13
     container_name: hbase-regionserver
     hostname: hbase-regionserver
     env_file:
@@ -93,7 +93,7 @@ services:
       - 16030:16030
 
   hive-server:
-    image: liteonlab/hive-server:1.0.0-hive2.3.2
+    image: orozcohsu/hive-server:1.0.0-hive2.3.2
     container_name: hive-server
     env_file:
       - ./hivebase/hadoop-hive.env
@@ -104,7 +104,7 @@ services:
       - "10000:10000"
 
   hive-metastore:
-    image: liteonlab/hive-server:1.0.0-hive2.3.2
+    image: orozcohsu/hive-server:1.0.0-hive2.3.2
     container_name: hive-metastore
     env_file:
       - ./hivebase/hadoop-hive.env
@@ -117,7 +117,7 @@ services:
       - "9083:9083"
 
   presto-coordinator:
-    image: liteonlab/prestodb:1.0.0-prestodb0.181
+    image: orozcohsu/prestodb:1.0.0-prestodb0.181
     container_name: prestodb
     ports:
       - "8089:8080"
@@ -145,7 +145,7 @@ services:
       - metadata:/var/lib/mysql/
 
   jupyter:
-    image: liteonlab/jupyter:1.0.0
+    image: orozcohsu/jupyter:1.0.0
     build:
       context: ./jupyter
       dockerfile: dockerfile-jupyter
@@ -161,7 +161,7 @@ services:
       - jupyter:/home/jovyan/work:rw
 
   nodered:
-    image: liteonlab/nodered:1.0.0-v6
+    image: orozcohsu/nodered:1.0.0-v6
     container_name: nodered
     ports:
       - "1880:1880"
