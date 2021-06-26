@@ -1,0 +1,34 @@
+version: "3"
+
+services:
+  database:
+    image: mysql:5.7
+    container_name: database
+    restart: always
+    expose:
+      - "3306"
+    ports:
+      - "3306:3306"
+    environment:
+        MYSQL_ROOT_USER: root
+        MYSQL_ROOT_PASSWORD: 1234
+        MYSQL_DATABASE: hive
+        MYSQL_USER: hive
+        MYSQL_PASSWORD: hive
+    healthcheck:
+        test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+        timeout: 20s
+        retries: 10
+    volumes:
+      - ./mysql-init-files:/docker-entrypoint-initdb.d
+      - mydatabase:/var/lib/mysql/
+
+  client:
+    image: imega/mysql-client
+    container_name: client
+    command: tail -f /dev/null
+    links:
+      - "database"
+
+volumes:
+  mydatabase:
