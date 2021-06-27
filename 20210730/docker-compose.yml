@@ -76,6 +76,8 @@ services:
   driver:
     image: orozcohsu/hadoop-driver:1.0.0-hadoop2.7.4-java8
     container_name: driver
+    volumes:
+      - ./data:/data  
     environment:
       SERVICE_PRECONDITION: "namenode:50070 datanode:50075 resourcemanager:8088"
     command: tail -f /dev/null
@@ -90,7 +92,7 @@ services:
       - "resourcemanager"
     hostname: hbase-master
     env_file:
-      - ./hivebase/hbase-distributed-local.env
+      - ./hivehbase/hbase-distributed-local.env
     environment:
       SERVICE_PRECONDITION: "namenode:9000 datanode:50075 zoo:2181"
     ports:
@@ -102,7 +104,7 @@ services:
     container_name: hbase-regionserver
     hostname: hbase-regionserver
     env_file:
-      - ./hivebase/hbase-distributed-local.env
+      - ./hivehbase/hbase-distributed-local.env
     environment:
       HBASE_CONF_hbase_regionserver_hostname: hbase-region
       SERVICE_PRECONDITION: "namenode:9000 datanode:50075 zoo:2181 hbase-master:16010"
@@ -113,18 +115,19 @@ services:
     image: orozcohsu/hive-server:1.0.0-hive2.3.2
     container_name: hive-server
     env_file:
-      - ./hivebase/hadoop-hive.env
+      - ./hivehbase/hadoop-hive.env
     environment:
       HIVE_CORE_CONF_javax_jdo_option_ConnectionURL: "jdbc:mysql://metadata/hive?useSSL=false"
       SERVICE_PRECONDITION: "namenode:9000 datanode:50075 hive-metastore:9083"
     ports:
       - "10000:10000"
+      - "10002:10002"
 
   hive-metastore:
     image: orozcohsu/hive-server:1.0.0-hive2.3.2
     container_name: hive-metastore
     env_file:
-      - ./hivebase/hadoop-hive.env
+      - ./hivehbase/hadoop-hive.env
     command: /opt/hive/bin/hive --service metastore
     depends_on:
       - "metadata"
@@ -163,9 +166,6 @@ services:
 
   jupyter:
     image: orozcohsu/jupyter:1.0.0
-    build:
-      context: ./jupyter
-      dockerfile: dockerfile-jupyter
     container_name: jupyter
     ports:
       - 8888:8888
