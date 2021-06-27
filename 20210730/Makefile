@@ -19,4 +19,5 @@ build:
 	docker build -t orozcohsu/prestodb:$(presto_branch) ./prestodb
 	docker build -t orozcohsu/nodered:$(nodered_branch) ./nodered
 	docker build -t orozcohsu/hadoop-submit:$(hadoop_branch) ./submit
+	docker build -t orozcohsu/hadoop-driver:$(hadoop_branch) ./driver
 
