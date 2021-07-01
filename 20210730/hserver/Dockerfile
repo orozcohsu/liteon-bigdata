@@ -1,4 +1,4 @@
-FROM liteonlab/hive-base:1.0.0-hive2.3.2
+FROM orozcohsu/hive-base:1.0.0-hive2.3.2
 
 HEALTHCHECK CMD netstat -an | grep 9083 > /dev/null; if [ 0 != $? ]; then exit 1; fi;
 

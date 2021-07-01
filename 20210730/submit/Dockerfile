@@ -1,4 +1,4 @@
-FROM liteonlab/hadoop-base:1.0.0-hadoop2.7.4-java8
+FROM orozcohsu/hadoop-base:1.0.0-hadoop2.7.4-java8
 
 COPY WordCount.jar /opt/hadoop/applications/WordCount.jar
 RUN chmod a+x /opt/hadoop/applications/WordCount.jar
