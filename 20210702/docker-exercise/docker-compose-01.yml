@@ -19,6 +19,7 @@ services:
         retries: 10
     volumes:
       - ./mysql-init-files:/docker-entrypoint-initdb.d
+      - /etc/localtime:/etc/localtime:ro
       - mydatabase:/var/lib/mysql/
 
   client:
@@ -28,6 +29,7 @@ services:
     links:
       - "database"
     volumes:
+      - /etc/localtime:/etc/localtime:ro
       - ./data:/data
 
 volumes:

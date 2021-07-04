@@ -10,17 +10,19 @@ services:
       - "9000"
     ports:
       - 50070:50070
-      - 14000:14000
     environment:
       - CLUSTER_NAME=test
     env_file:
       - ./hadoopbase/hadoop.env
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
 
   datanode:
     image: orozcohsu/hadoop-datanode:1.0.0-hadoop2.7.4-java8
     container_name: datanode
     volumes:
       - hadoop_datanode:/hadoop/dfs/data
+      - /etc/localtime:/etc/localtime:ro
     environment:
       SERVICE_PRECONDITION: "namenode:50070"
     env_file:
@@ -36,6 +38,8 @@ services:
       SERVICE_PRECONDITION: "namenode:50070 datanode:50075"
     env_file:
       - ./hadoopbase/hadoop.env
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
 
   nodemanager:
     image: orozcohsu/hadoop-nodemanager:1.0.0-hadoop2.7.4-java8
@@ -44,6 +48,8 @@ services:
       SERVICE_PRECONDITION: "namenode:50070 datanode:50075 resourcemanager:8088"
     env_file:
       - ./hadoopbase/hadoop.env
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
 
   historyserver:
     image: orozcohsu/hadoop-historyserver:1.0.0-hadoop2.7.4-java8
@@ -56,6 +62,8 @@ services:
       SERVICE_PRECONDITION: "namenode:50070 datanode:50075 resourcemanager:8088"
     env_file:
       - ./hadoopbase/hadoop.env
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
 
   zoo:
     image: zookeeper:3.4.10
@@ -65,6 +73,8 @@ services:
       ZOO_SERVERS: server.1=0.0.0.0:2888:3888
     ports:
       - 2181:2181
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
 
   submit:
     image: orozcohsu/hadoop-submit:1.0.0-hadoop2.7.4-java8
@@ -73,12 +83,15 @@ services:
       SERVICE_PRECONDITION: "namenode:50070 datanode:50075 resourcemanager:8088"
     env_file:
       - ./hadoopbase/hadoop.env
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
 
   driver:
     image: orozcohsu/hadoop-driver:1.0.0-hadoop2.7.4-java8
     container_name: driver
     volumes:
       - ./data:/data  
+      - /etc/localtime:/etc/localtime:ro
     environment:
       SERVICE_PRECONDITION: "namenode:50070 datanode:50075 resourcemanager:8088"
     command: tail -f /dev/null
@@ -99,6 +112,8 @@ services:
     ports:
       - 16010:16010
       - 4444:4444
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
 
   hbase-region:
     image: orozcohsu/hbase-regionserver:1.0.0-hbase1.4.13
@@ -111,6 +126,8 @@ services:
       SERVICE_PRECONDITION: "namenode:9000 datanode:50075 zoo:2181 hbase-master:16010"
     ports:
       - 16030:16030
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
 
   hive-server:
     image: orozcohsu/hive-server:1.0.0-hive2.3.2
@@ -123,6 +140,8 @@ services:
     ports:
       - "10000:10000"
       - "10002:10002"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
 
   hive-metastore:
     image: orozcohsu/hive-server:1.0.0-hive2.3.2
@@ -136,12 +155,16 @@ services:
       SERVICE_PRECONDITION: "namenode:9000 datanode:50075"
     ports:
       - "9083:9083"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
 
   presto-coordinator:
     image: orozcohsu/prestodb:1.0.0-prestodb0.181
     container_name: prestodb
     ports:
       - "8089:8080"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
 
   metadata:
     image: mysql:5.7
@@ -163,6 +186,7 @@ services:
         retries: 10
     volumes:
       - ./mysql-init-files:/docker-entrypoint-initdb.d
+      - /etc/localtime:/etc/localtime:ro
       - metadata:/var/lib/mysql/
 
   jupyter:
@@ -177,6 +201,8 @@ services:
         retries: 10
     volumes:
       - jupyter:/home/jovyan/work:rw
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
 
   nodered:
     image: orozcohsu/nodered:1.0.0-v6
@@ -185,6 +211,8 @@ services:
       - "1880:1880"
     volumes:
       - nodered:/data
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
 
 volumes:
   hadoop_namenode:
