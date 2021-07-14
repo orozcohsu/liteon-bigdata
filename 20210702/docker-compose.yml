@@ -6,6 +6,7 @@ services:
     container_name: namenode
     volumes:
       - hadoop_namenode:/hadoop/dfs/name
+      - /etc/localtime:/etc/localtime:ro
     expose:
       - "9000"
     ports:
@@ -14,8 +15,6 @@ services:
       - CLUSTER_NAME=test
     env_file:
       - ./hadoopbase/hadoop.env
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
 
   datanode:
     image: orozcohsu/hadoop-datanode:1.0.0-hadoop2.7.4-java8
