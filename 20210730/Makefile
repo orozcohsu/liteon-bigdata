@@ -3,6 +3,7 @@ hbase_branch := 1.0.0-hbase1.4.13
 hive_branch := 1.0.0-hive2.3.2
 presto_branch := 1.0.0-prestodb0.181
 nodered_branch := 1.0.0-v6
+jupyter_branch := 1.0.0
 
 build:
 	docker build -t orozcohsu/hadoop-base:$(hadoop_branch) ./hadoopbase
@@ -20,4 +21,5 @@ build:
 	docker build -t orozcohsu/nodered:$(nodered_branch) ./nodered
 	docker build -t orozcohsu/hadoop-submit:$(hadoop_branch) ./submit
 	docker build -t orozcohsu/hadoop-driver:$(hadoop_branch) ./driver
+	docker build -t orozcohsu/jupyter:$(jupyter_branch) ./jupyter
 

@@ -199,8 +199,7 @@ services:
         timeout: 20s
         retries: 10
     volumes:
-      - jupyter:/home/jovyan/work:rw
-    volumes:
+      - ./jupyter/code:/home/jovyan/work:rw
       - /etc/localtime:/etc/localtime:ro
 
   nodered:
